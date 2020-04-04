@@ -35,7 +35,7 @@ public class Main {
                 "Walk In The Mill",
                 "Kimberlite Candy",
                 "Magic Of Light",
-                "Potters Corner ",
+                "Potters Corner",
                 "Elegant Escape",
                 "Anibale Fly",
                 "Bristol De Mai",
@@ -100,7 +100,6 @@ public class Main {
                 //System.out.println("Assigned...");
             }
             //System.out.println("Unallocated? "+areThereHorsesUnallocated(horseList));
-
             //System.out.println("Player cycled: "+currentPlayer.getName());
             // Move to the next player
             int nextPlayerIndex = playerArrayList.indexOf(currentPlayer) + 1;
@@ -111,31 +110,63 @@ public class Main {
             }
         }
 
-        System.out.println("\nPlayer List:");
-        ShowListByPlayers (playerArrayList);
-        System.out.println("\nHorse List");
-        ShowListByHorses (horseList);
+        if (doValidation(horseList, playerArrayList)) {
+            System.out.println("\nPlayer List:");
+            ShowListByPlayers(playerArrayList);
+            System.out.println("\nHorse List");
+            ShowListByHorses(horseList);
+
+        }
+    }
+
+    /**
+     * Compares each horse with its assigned player, and checks that the player has that horse allocated.
+     *
+     * @param horseList
+     * @param playerArrayList
+     */
+    private static boolean doValidation(ArrayList<Horse> horseList, ArrayList<Player> playerArrayList) {
+        // Go through list of horses
+        for (Horse iHorse : horseList) {
+            Player assignedPlayer = iHorse.getAllocatedPlayer();
+            //System.out.println("Verifying: "+assignedPlayer.getName());
+            // Check that the allocated player has this horse assigned.
+            boolean hasThisHorseAssigned = false;
+            for (Horse jHorse : assignedPlayer.getAllocatedHorses()) {
+                //System.out.println("Checking..."+jHorse.getName());
+                if (jHorse.equals(iHorse)) {
+                    hasThisHorseAssigned = true;
+                    //System.out.println("Verified "+jHorse.getName());
+                    //break;
+                }
+            }
+            if (!hasThisHorseAssigned) {
+                System.out.println("Error with horse: " + iHorse);
+                return false;
+            }
+        }
+        System.out.println("Verification OK.");
+        return true;
     }
 
     private static void ShowListByHorses(ArrayList<Horse> horseList) {
-        for (Horse iHorse: horseList
-             ) {
-            System.out.println(iHorse.getName()+": "+iHorse.getAllocatedPlayer().getName());
+        for (Horse iHorse : horseList
+                ) {
+            System.out.println(iHorse.getName() + ": " + iHorse.getAllocatedPlayer().getName());
         }
     }
 
     private static void ShowListByPlayers(ArrayList<Player> playerArrayList) {
-        for (Player iPlayer:playerArrayList
-             ) {
-            System.out.println("Player: "+iPlayer.getName());
-            for (Horse iHorse:iPlayer.getAllocatedHorses()
-                 ) {
-                System.out.print(iHorse.getName()+", ");
+        for (Player iPlayer : playerArrayList
+                ) {
+            System.out.println("Player: " + iPlayer.getName());
+            for (Horse iHorse : iPlayer.getAllocatedHorses()
+                    ) {
+                System.out.print(iHorse.getName() + ", ");
             }
             System.out.print("\n");
         }
     }
-
 
 
     private static int getRandomInt(int length) {
