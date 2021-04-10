@@ -1,77 +1,84 @@
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+//import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Main {
 
     // List of player names in age order
     private static final String[] PLAYER_LIST;
+    private static final String SAVE_FILENAME = "Z:\\Charlie\\Documents\\Grand Horse Allocation 2021.txt";
 
     static {
-        PLAYER_LIST = new String[]{"Florence",
-                "Canadian Youngster 1",
-                "Canadian Youngster 2",
-                "Canadian Youngster 3",
-                "Georgina",
+        PLAYER_LIST = new String[]{"Finley",
+                "Florence",
+                "Owen",
+                "Eleanor",
+                "Louise",
                 "Thomas",
                 "Emily",
                 "Edward",
                 "Zoé",
                 "James",
                 "Julia",
-                "Charles",
                 "Anne",
-                "John"};
+                "John",
+                "Charles"
+        };
     }
 
     private static final String[] HORSE_LIST;
 
     static {
         HORSE_LIST = new String[]{
-                "Tiger Roll",
-                "Any Second Now",
+                "Cloth Cap",
+                "Minella Times",
                 "Burrows Saint",
-                "Definitly Red",
-                "Walk In The Mill",
+                "Any Second Now",
                 "Kimberlite Candy",
+                "Discorama",
                 "Magic Of Light",
+                "Farclass",
                 "Potters Corner",
-                "Elegant Escape",
                 "Anibale Fly",
                 "Bristol De Mai",
-                "Ok Corral",
-                "Alpha Des Obeaux",
-                "Ballyoptic",
-                "Talkischeap",
-                "Pleasant Company",
-                "Yala Enki",
-                "Vintage Clouds",
+                "Milan Native",
+                "Takingrisks",
+                "Mister Malarky",
+                "Lord du Mesnil",
                 "Acapella Bourgeois",
-                "Sub Lieutenant",
-                "Beware The Bear",
-                "The Storyteller",
-                "Jury Duty",
-                "Total Recall",
-                "Top Ville Ben",
-                "Death Duty",
-                "Dounikos",
-                "Jett Jett",
-                "Kildisart",
-                "Peregrine Run",
-                "Crievehill",
-                "Valtor",
-                "Ramses De Teillee",
-                "Saint Xavier",
-                "Aso",
+                "Canelo",
+                "Viex Lion Rouge",
+                "Class Conti",
                 "Shattered Love",
+                "Yala Enki",
+                "Definitly Red",
+                "Hogan's Height",
+                "Jett",
+                "Balko Des Flos",
+                "Alpha Des Obeaux",
+                "Talkischeap",
+                "Lake View Lad",
+                "Chris's Dream",
+                "Blaklion",
+                "The Long Mile",
+                "Give Me A Copper",
+                "OK Corral",
+                "Ballyoptic",
+                "Sub Lieutenant",
+                "Minellacelebration",
+                "Double Shuffle",
+                "Cabaret Queen",
                 "Tout Est Permis",
-                "Warriors Tale",
-                "Double Shuffle"
+                "Ami Desbois"
+                // Reserves: "Some Neck", "Kauto Riko", "Fagan",
         };
     }
 
     public static void main(String[] args) {
-
 
         System.out.println("Grand Horse Allocator 2020.\n" +
                 "Copyright Serene Sky Software 2020. All rights reserved.\n" +
@@ -111,11 +118,42 @@ public class Main {
         }
 
         if (doValidation(horseList, playerArrayList)) {
-            System.out.println("\nPlayer List:");
-            ShowListByPlayers(playerArrayList);
-            System.out.println("\nHorse List");
-            ShowListByHorses(horseList);
 
+            FileWriter saveFileWriter = openFile ();
+
+            System.out.println("\nPlayer List:");
+            ShowListByPlayers(playerArrayList, saveFileWriter);
+            System.out.println("\nHorse List");
+            ShowListByHorses(horseList, saveFileWriter);
+
+            closeFile(saveFileWriter);
+
+        }
+    }
+
+    // Opens file for writing, returns a FileWriter
+    private static FileWriter openFile() {
+        try {
+            if (Files.exists(Paths.get(SAVE_FILENAME))) {
+                Files.delete(Paths.get(SAVE_FILENAME));
+            }
+            Files.createFile(Paths.get(SAVE_FILENAME));
+            //doErrorMessage("Created new data save file.");
+            FileWriter saveFileWriter = new FileWriter(SAVE_FILENAME);
+            return saveFileWriter;
+        } catch (IOException e) {
+            e.printStackTrace();
+            //doErrorMessage("File write error.");
+        }
+        return null;
+    }
+
+    // Closes file.
+    private static void closeFile (FileWriter saveFileWriter) {
+        try {
+            saveFileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -149,22 +187,43 @@ public class Main {
         return true;
     }
 
-    private static void ShowListByHorses(ArrayList<Horse> horseList) {
+    private static void ShowListByHorses(ArrayList<Horse> horseList, FileWriter saveFileWriter) {
+
+        // Blank lines between two list sections for prettiness.
+        try {
+            saveFileWriter.append("\n\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         for (Horse iHorse : horseList
-                ) {
+        ) {
             System.out.println(iHorse.getName() + ": " + iHorse.getAllocatedPlayer().getName());
+            try {
+                saveFileWriter.append(iHorse.getName() + ": " + iHorse.getAllocatedPlayer().getName()+"\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private static void ShowListByPlayers(ArrayList<Player> playerArrayList) {
+    private static void ShowListByPlayers(ArrayList<Player> playerArrayList, FileWriter saveFileWriter) {
         for (Player iPlayer : playerArrayList
+        ) {
+            try {
+                System.out.println("Player: " + iPlayer.getName());
+                saveFileWriter.write("\nPlayer: " + iPlayer.getName()+"\n");
+
+                for (Horse iHorse : iPlayer.getAllocatedHorses()
                 ) {
-            System.out.println("Player: " + iPlayer.getName());
-            for (Horse iHorse : iPlayer.getAllocatedHorses()
-                    ) {
-                System.out.print(iHorse.getName() + ", ");
+                    System.out.print(iHorse.getName() + ", ");
+                    saveFileWriter.write(iHorse.getName() + ", ");
+                }
+                System.out.print("\n");
+                saveFileWriter.write("\n");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            System.out.print("\n");
         }
     }
 
@@ -185,7 +244,7 @@ public class Main {
         // Print some confirmatory info
         System.out.println("Total runners: " + horseArrayList.size());
         for (Horse iHorse : horseArrayList
-                ) {
+        ) {
             System.out.println("Horse name: " + iHorse.getName());
         }
         return horseArrayList;
@@ -200,7 +259,7 @@ public class Main {
         }
         System.out.println("Total Players: " + playerList.size());
         for (Player iPlayer : playerList
-                ) {
+        ) {
             System.out.println("Player name: " + iPlayer.getName());
         }
         return playerList;
